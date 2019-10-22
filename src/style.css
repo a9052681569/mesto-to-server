@@ -9,7 +9,6 @@
 @import url(../blocks/places-list/places-list.css);
 @import url(../blocks/place-card/place-card.css);
 @import url(../blocks/popup/popup.css);
-
 body {
   background-color: #000;
 }

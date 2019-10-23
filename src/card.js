@@ -1,17 +1,18 @@
 // импортируем переменную необходимую для работыэтому классу
-import {api} from './index.js';
+import {api} from './api';
 // класс, создающий карточку
 export class Card {
     constructor(name, link, id) {
       this.name = name; 
       this.link = link;
       this.id = id;
+      this.api = api;
     // добавляем карточку в свойство объекта
       this.cardElement = this.create();
     // добавляем карточке слушатель лайка
-      this.cardElement.querySelector('.place-card__like-icon').addEventListener('click', api.like);
+      this.cardElement.querySelector('.place-card__like-icon').addEventListener('click', this.api.like);
     // добавляем карточке слушатель удаления
-      this.cardElement.querySelector('.place-card__delete-icon').addEventListener('click', api.deleteCard)
+      this.cardElement.querySelector('.place-card__delete-icon').addEventListener('click', this.api.deleteCard)
     }
   // верстаем карточку
     create() {

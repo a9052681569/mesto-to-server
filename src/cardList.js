@@ -1,6 +1,6 @@
 // импортируем переменные и классы, необходимые для работы этому классу
-import {Card} from './card.js';
-import {Popup} from './popup.js';
+import {Card} from './card';
+import {Popup} from './popup';
 // класс для хранения и отрисовки карточек
 export class CardList {
     constructor(container, cards) {

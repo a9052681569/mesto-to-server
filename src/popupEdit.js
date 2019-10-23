@@ -1,12 +1,14 @@
 // импортируем переменные и классы, необходимые для работы этому классу
-import {formEditUser, api, popupEdit} from './index.js';
-import {Popup} from './popup.js';
+import {api} from './api';
+import {Popup} from './popup';
 
 
 // класс попапа редактирования профиля
-export class PopupEdit extends Popup {
+class PopupEdit extends Popup {
     constructor(popup, btn) {
       super(popup, btn);
+      this.api = api;
+      this.editor = this.editor.bind(this);
       // слушатель клика по кнопке Edit открывает форму ввода данных пользователя
       this.button.addEventListener('click', function() {
         popupEdit.toggle();
@@ -19,7 +21,7 @@ export class PopupEdit extends Popup {
         formEditUser.elements.about.value = document.querySelector('.user-info__job').textContent;
       });
     // запрашиваем имя пользователя и информацию о себе с сервера
-      api.sayMyName()
+      this.api.sayMyName()
         // в этом then result - объект с данными пользователя
         .then((result) => {
           // вставляем данные в нужные поля
@@ -29,9 +31,10 @@ export class PopupEdit extends Popup {
         })
         .catch(err => console.log(err));
     // слушатель, меняющий имя и информацию о себе на введенные пользователем
-      this.editor();
+      formEditUser.addEventListener('submit', this.editor);
     // слушатель валидирующий форму ввода данных пользователя
       formEditUser.addEventListener('input', this.handler);
+      
     }
   // валидатор формы данных пользователя
     handler() {
@@ -56,36 +59,37 @@ export class PopupEdit extends Popup {
       }
     }
   // метод, меняющий имя и информацию о себе на введенные пользователем
-    editor() {
-      formEditUser.addEventListener('submit', function(event) {
-        // избегаем перезагрузки страници
-        event.preventDefault();
-        // добавляем в константы путь к полям ввода
-        const { name, about } = formEditUser.elements;
-        // пока идет обновление данных кнопка "Сохранить" меняет свой текст на "Загрузка..."
-        document.querySelector('.popup__button_edit').textContent = 'Загрузка...';     
-        // заменяем имя и информацию на введенные пользователем
-        api.userEdit(name, about)
-          // если прошел запрос на сервер - заменяем имя и информацию (на странице) на введенные пользователем
-          .then((res) => {
-            if(res.ok) {
-                document.querySelector('.user-info__name').textContent = name.value;
-                document.querySelector('.user-info__job').textContent = about.value;
-            }
-            // автоматически закрываем форму после загрузки
-            if(res.status === 200) {
-              popupEdit.toggle();
-            }
-          })
-          // в случае ошибки закрываем форму и выводим сообщение об ошибке
-          .catch((err) => {
-            popupEdit.toggle();
-            alert(`Ошибка: ${err}`);
-          })
-          // в любом случае после окончания обработки запроса возвращаем кнопке "Сохранить" изначальный вид
-          .finally((res) => {
-            document.querySelector('.popup__button_edit').textContent = 'Сохранить';
-          })
-      });
+    editor(event) {
+      // избегаем перезагрузки страници
+      event.preventDefault();
+      // добавляем в константы путь к полям ввода
+      const { name, about } = formEditUser.elements;
+      // пока идет обновление данных кнопка "Сохранить" меняет свой текст на "Загрузка..."
+      document.querySelector('.popup__button_edit').textContent = 'Загрузка...';     
+      // заменяем имя и информацию на введенные пользователем
+      this.api.userEdit(name, about)
+        // если прошел запрос на сервер - заменяем имя и информацию (на странице) на введенные пользователем
+        .then((res) => {
+          if(res.ok) {
+              document.querySelector('.user-info__name').textContent = name.value;
+              document.querySelector('.user-info__job').textContent = about.value;
+          }
+          // автоматически закрываем форму после загрузки
+          if(res.status === 200) {
+            this.toggle();
+          }
+        })
+        // в случае ошибки закрываем форму и выводим сообщение об ошибке
+        .catch((err) => {
+          this.toggle();
+          console.log(`Ошибка: ${err}`);
+        })
+        // в любом случае после окончания обработки запроса возвращаем кнопке "Сохранить" изначальный вид
+        .finally((res) => {
+          document.querySelector('.popup__button_edit').textContent = 'Сохранить';
+        })
     }
-  }
+}
+
+const { edit: formEditUser} = document.forms;
+export const popupEdit = new PopupEdit(document.querySelector('.popup__edit'), document.querySelector('.user-info__button_edit'));

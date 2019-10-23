@@ -1,12 +1,12 @@
 // импортируем переменные и классы, необходимые для работы этому классу
-import {formAvatar, api} from './index.js';
-import {Popup} from './popup.js';
 
+import {Popup} from './popup';
+import { api } from './api';
 // класс, отвечающий за смену аватара 
 export class PopupAvatar extends Popup {
     constructor(popup, btn) {
       super(popup, btn);
-  
+      this.api = api;
       this.button.addEventListener('click', () => {
         formAvatar.elements.link.nextElementSibling.textContent = 'Это обязательное поле';
         this.toggle();
@@ -14,7 +14,7 @@ export class PopupAvatar extends Popup {
       })
   
       formAvatar.addEventListener('input', this.handler);
-      formAvatar.addEventListener('submit', api.editAvatar)
+      formAvatar.addEventListener('submit', this.api.editAvatar);
     }
   
     handler() {
@@ -41,3 +41,5 @@ export class PopupAvatar extends Popup {
       
     }
   }
+
+export const {avatar: formAvatar} = document.forms;
